@@ -16,7 +16,7 @@ app.use((req, _res, next) => {
 });
 
 // Health check route
-app.get('/', healthRouter);
+app.use('/', healthRouter);
 
 // ❌ Error handler (always last)
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
