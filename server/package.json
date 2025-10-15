@@ -1,0 +1,43 @@
+{
+  "name": "server",
+  "scripts": {
+    "dev": "nodemon",
+    "lint": "eslint . --ext .ts && prettier --check .",
+    "format": "prettier --write .",
+    "start": "ts-node src/server.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.4.2",
+    "@types/winston": "^2.4.4",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "eslint": "^9.30.1",
+    "eslint-config-prettier": "^10.1.5",
+    "husky": "^8.0.0",
+    "lint-staged": "^16.1.2",
+    "nodemon": "^3.0.3",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.1.6",
+    "typescript-eslint": "^8.35.1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "ethers": "^6.8.1",
+    "express": "^4.18.2",
+    "winston": "^3.17.0"
+  },
+  "lint-staged": {
+    "**/*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"
+}
