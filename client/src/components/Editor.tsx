@@ -29,7 +29,7 @@ const debounce = (fn: (...args: any[]) => void, delay: number) => {
 
 export const Editor: React.FC = () => {
   const [wordCount, setWordCount] = useState(0);
-  const DOC_ID = 'main-doc';
+  const DOC_ID = 'main-docs';
 
   const editor = useEditor({
     extensions: [
@@ -43,7 +43,6 @@ export const Editor: React.FC = () => {
     autofocus: 'end',
   });
 
-  // Initialize collab plugin after editor is ready
   useEffect(() => {
     if (!editor) return;
 
@@ -51,14 +50,12 @@ export const Editor: React.FC = () => {
       const res = await fetch(`http://localhost:3001/collab/${DOC_ID}/steps`);
       const data = await res.json();
 
-      // Add ProseMirror collab plugin with current server version
       editor.view.updateState(
         editor.state.reconfigure({
           plugins: [...editor.state.plugins, collab({ version: data.version })],
         })
       );
 
-      // Apply any existing steps
       if (data.steps?.length) {
         const tr = receiveTransaction(editor.state, data.steps, data.clientIDs);
         editor.view.dispatch(tr);
@@ -67,45 +64,15 @@ export const Editor: React.FC = () => {
 
     initCollab();
 
-    // Periodically sync
     const sync = async () => {
       if (!editor) return;
 
-      // Send unconfirmed steps
-      const sendable = sendableSteps(editor.state);
-      if (sendable) {
-        const payload = {
-          version: getVersion(editor.state),
-          steps: sendable.steps.map((s) => s.toJSON()),
-          clientID: sendable.clientID,
-        };
-
-        const res = await fetch(
-          `http://localhost:3001/collab/${DOC_ID}/steps`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        if (res.status === 409) {
-          // Conflict — rebase with new steps
-          const data = await res.json();
-          const tr = receiveTransaction(
-            editor.state,
-            data.steps,
-            data.clientIDs
-          );
-          editor.view.dispatch(tr);
-        }
-      }
-
-      // Fetch latest steps from server
+      // First, fetch latest steps from server
       const resFetch = await fetch(
         `http://localhost:3001/collab/${DOC_ID}/steps`
       );
       const dataFetch = await resFetch.json();
+
       if (dataFetch.steps?.length) {
         const tr = receiveTransaction(
           editor.state,
@@ -114,12 +81,44 @@ export const Editor: React.FC = () => {
         );
         editor.view.dispatch(tr);
       }
+
+      // Now send unconfirmed steps
+      const sendable = sendableSteps(editor.state);
+      if (!sendable) return;
+
+      const payload = {
+        version: getVersion(editor.state),
+        steps: sendable.steps.map((s) => s.toJSON()),
+        clientID: sendable.clientID,
+      };
+
+      const res = await fetch(`http://localhost:3001/collab/${DOC_ID}/steps`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.status === 409) {
+        // Conflict — rebase with new steps
+        const data = await res.json();
+        const tr = receiveTransaction(editor.state, data.steps, data.clientIDs);
+        editor.view.dispatch(tr);
+      }
     };
 
-    const debouncedSync = debounce(sync, 1000);
+    // Debounced sync for interval and update
+    const debouncedSync = debounce(sync, 500);
+
+    // Old interval (optional, can keep for safety)
     const interval = setInterval(debouncedSync, 2000);
 
-    return () => clearInterval(interval);
+    // ✅ New: sync on every editor update
+    editor.on('update', debouncedSync);
+
+    return () => {
+      clearInterval(interval);
+      editor.off('update', debouncedSync);
+    };
   }, [editor]);
 
   // Word count
