@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
+import {
+  collab,
+  sendableSteps,
+  getVersion,
+  receiveTransaction,
+} from 'prosemirror-collab';
 import {
   Bold,
   Italic,
@@ -12,8 +18,18 @@ import {
   Unlink,
 } from 'lucide-react';
 
+// Debounce util
+const debounce = (fn: (...args: any[]) => void, delay: number) => {
+  let timer: any;
+  return (...args: any[]) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+};
+
 export const Editor: React.FC = () => {
   const [wordCount, setWordCount] = useState(0);
+  const DOC_ID = 'main-doc';
 
   const editor = useEditor({
     extensions: [
@@ -24,15 +40,102 @@ export const Editor: React.FC = () => {
         linkOnPaste: true,
       }),
     ],
-    content: '<p>Start typing your essay...</p>',
     autofocus: 'end',
-    onUpdate: ({ editor }) => {
-      const text = editor.getText();
-      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      setWordCount(words);
-    },
   });
 
+  // Initialize collab plugin after editor is ready
+  useEffect(() => {
+    if (!editor) return;
+
+    const initCollab = async () => {
+      const res = await fetch(`http://localhost:3001/collab/${DOC_ID}/steps`);
+      const data = await res.json();
+
+      // Add ProseMirror collab plugin with current server version
+      editor.view.updateState(
+        editor.state.reconfigure({
+          plugins: [...editor.state.plugins, collab({ version: data.version })],
+        })
+      );
+
+      // Apply any existing steps
+      if (data.steps?.length) {
+        const tr = receiveTransaction(editor.state, data.steps, data.clientIDs);
+        editor.view.dispatch(tr);
+      }
+    };
+
+    initCollab();
+
+    // Periodically sync
+    const sync = async () => {
+      if (!editor) return;
+
+      // Send unconfirmed steps
+      const sendable = sendableSteps(editor.state);
+      if (sendable) {
+        const payload = {
+          version: getVersion(editor.state),
+          steps: sendable.steps.map((s) => s.toJSON()),
+          clientID: sendable.clientID,
+        };
+
+        const res = await fetch(
+          `http://localhost:3001/collab/${DOC_ID}/steps`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (res.status === 409) {
+          // Conflict — rebase with new steps
+          const data = await res.json();
+          const tr = receiveTransaction(
+            editor.state,
+            data.steps,
+            data.clientIDs
+          );
+          editor.view.dispatch(tr);
+        }
+      }
+
+      // Fetch latest steps from server
+      const resFetch = await fetch(
+        `http://localhost:3001/collab/${DOC_ID}/steps`
+      );
+      const dataFetch = await resFetch.json();
+      if (dataFetch.steps?.length) {
+        const tr = receiveTransaction(
+          editor.state,
+          dataFetch.steps,
+          dataFetch.clientIDs
+        );
+        editor.view.dispatch(tr);
+      }
+    };
+
+    const debouncedSync = debounce(sync, 1000);
+    const interval = setInterval(debouncedSync, 2000);
+
+    return () => clearInterval(interval);
+  }, [editor]);
+
+  // Word count
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateWordCount = () => {
+      const text = editor.getText();
+      setWordCount(text.trim() ? text.trim().split(/\s+/).length : 0);
+    };
+
+    editor.on('update', updateWordCount);
+    return () => editor.off('update', updateWordCount);
+  }, [editor]);
+
+  // Link handling
   const setLink = () => {
     if (!editor) return;
     const previousUrl = editor.getAttributes('link').href;
@@ -59,7 +162,6 @@ export const Editor: React.FC = () => {
           >
             <Bold size={16} />
           </button>
-
           <button
             onClick={() => editor?.chain().focus().toggleItalic().run()}
             className={`p-2 rounded hover:bg-gray-100 ${
@@ -69,7 +171,6 @@ export const Editor: React.FC = () => {
           >
             <Italic size={16} />
           </button>
-
           <button
             onClick={() => editor?.chain().focus().toggleBulletList().run()}
             className={`p-2 rounded hover:bg-gray-100 ${
@@ -79,7 +180,6 @@ export const Editor: React.FC = () => {
           >
             <List size={16} />
           </button>
-
           <button
             onClick={() => editor?.chain().focus().toggleOrderedList().run()}
             className={`p-2 rounded hover:bg-gray-100 ${
@@ -89,7 +189,6 @@ export const Editor: React.FC = () => {
           >
             <ListOrdered size={16} />
           </button>
-
           <button
             onClick={() => editor?.chain().focus().toggleBlockquote().run()}
             className={`p-2 rounded hover:bg-gray-100 ${
@@ -99,7 +198,6 @@ export const Editor: React.FC = () => {
           >
             <Quote size={16} />
           </button>
-
           <button
             onClick={setLink}
             className="p-2 rounded hover:bg-gray-100"
@@ -107,7 +205,6 @@ export const Editor: React.FC = () => {
           >
             <LinkIcon size={16} />
           </button>
-
           <button
             onClick={() => editor?.chain().focus().unsetLink().run()}
             className="p-2 rounded hover:bg-gray-100"
