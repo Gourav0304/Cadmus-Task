@@ -10,6 +10,9 @@ importers:
 
   client:
     dependencies:
+      '@tiptap/extension-link':
+        specifier: ^3.7.1
+        version: 3.7.1(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0)
       '@tiptap/pm':
         specifier: ^3.7.0
         version: 3.7.0
@@ -709,11 +712,11 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.7.0
 
-  '@tiptap/extension-link@3.7.0':
-    resolution: {integrity: sha512-J53OJEhnii1+8rk0lDEI5gcXl2h0VU/SaYsanRr0nTNntYcWRApJ/Ct+DmDiZj3u7/O02Uqa2hi28KtO4al0gw==}
+  '@tiptap/extension-link@3.7.1':
+    resolution: {integrity: sha512-6+0/mo+EKDiA1d1pDZSsf/51ZOwdFnN35yF/4celxdr/JL4aupvtttIjGAtWd37h50cadYSL4F1uacKs7yyh8Q==}
     peerDependencies:
-      '@tiptap/core': ^3.7.0
-      '@tiptap/pm': ^3.7.0
+      '@tiptap/core': ^3.7.1
+      '@tiptap/pm': ^3.7.1
 
   '@tiptap/extension-list-item@3.7.0':
     resolution: {integrity: sha512-kFAuPlT1Id4Swy+QosgoBp1HL58csAeU0wRifl6JUWUiP4Uao3GmziBnBSObTI5e7a1ELwmH6UcES1YInRkmfQ==}
@@ -2677,7 +2680,7 @@ snapshots:
     dependencies:
       '@tiptap/core': 3.7.0(@tiptap/pm@3.7.0)
 
-  '@tiptap/extension-link@3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0)':
+  '@tiptap/extension-link@3.7.1(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0)':
     dependencies:
       '@tiptap/core': 3.7.0(@tiptap/pm@3.7.0)
       '@tiptap/pm': 3.7.0
@@ -2774,7 +2777,7 @@ snapshots:
       '@tiptap/extension-heading': 3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))
       '@tiptap/extension-horizontal-rule': 3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0)
       '@tiptap/extension-italic': 3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))
-      '@tiptap/extension-link': 3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0)
+      '@tiptap/extension-link': 3.7.1(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0)
       '@tiptap/extension-list': 3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0)
       '@tiptap/extension-list-item': 3.7.0(@tiptap/extension-list@3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0))
       '@tiptap/extension-list-keymap': 3.7.0(@tiptap/extension-list@3.7.0(@tiptap/core@3.7.0(@tiptap/pm@3.7.0))(@tiptap/pm@3.7.0))

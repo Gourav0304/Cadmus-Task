@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tiptap/extension-link": "^3.7.1",
     "@tiptap/pm": "^3.7.0",
     "@tiptap/react": "^3.7.0",
     "@tiptap/starter-kit": "^3.7.0",
