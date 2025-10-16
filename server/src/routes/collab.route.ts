@@ -1,45 +1,60 @@
 import express, { Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
-interface StepEntry {
-  steps: any[];
-  clientIDs: (string | number)[];
-  version: number;
-}
-
-const docs: Record<string, StepEntry> = {};
-
-// 🟩 Fetch steps newer than a given version
-router.get('/:id/steps', (req: Request, res: Response) => {
+// Fetch steps newer than a version
+router.get('/:id/steps', async (req: Request, res: Response) => {
   const { id } = req.params;
   const version = Number(req.query.version || 0);
 
-  const doc = docs[id] || { steps: [], clientIDs: [], version: 0 };
-  if (!docs[id]) docs[id] = doc;
+  let doc = await prisma.doc.findUnique({ where: { id } });
+  if (!doc) {
+    doc = await prisma.doc.create({
+      data: { id, steps: [], clientIDs: [], version: 0 },
+    });
+  }
 
   const steps = doc.steps.slice(version);
   const clientIDs = doc.clientIDs.slice(version);
   res.json({ steps, clientIDs, version: doc.version });
 });
 
-// 🟦 Add new steps
-router.post('/:id/steps', (req: Request, res: Response) => {
+// Add new steps
+router.post('/:id/steps', async (req: Request, res: Response) => {
   const { id } = req.params;
   const { version, steps, clientID, clientIDs } = req.body;
 
-  const doc = docs[id] || { steps: [], clientIDs: [], version: 0 };
-  if (!docs[id]) docs[id] = doc;
-
-  if (version !== doc.version) {
-    return res.status(409).json({ error: 'Version conflict' });
+  let doc = await prisma.doc.findUnique({ where: { id } });
+  if (!doc) {
+    doc = await prisma.doc.create({
+      data: { id, steps: [], clientIDs: [], version: 0 },
+    });
   }
 
-  doc.steps.push(...steps);
-  doc.clientIDs.push(...(clientIDs || steps.map(() => clientID)));
-  doc.version += steps.length;
+  if (version !== doc.version) {
+    return res.status(409).json({
+      error: 'Version conflict',
+      steps: doc.steps,
+      clientIDs: doc.clientIDs,
+      version: doc.version,
+    });
+  }
 
-  res.json({ version: doc.version });
+  const newSteps = [...doc.steps, ...steps];
+  const newClientIDs = [
+    ...doc.clientIDs,
+    ...(clientIDs || steps.map(() => clientID)),
+  ];
+  const newVersion = doc.version + steps.length;
+
+  await prisma.doc.update({
+    where: { id },
+    data: { steps: newSteps, clientIDs: newClientIDs, version: newVersion },
+  });
+
+  res.json({ version: newVersion });
 });
 
 export default router;

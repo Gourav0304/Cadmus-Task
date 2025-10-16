@@ -25,10 +25,12 @@
     "typescript-eslint": "^8.35.1"
   },
   "dependencies": {
+    "@prisma/client": "^6.17.1",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "ethers": "^6.8.1",
     "express": "^4.21.2",
+    "prisma": "^6.17.1",
     "winston": "^3.17.0"
   },
   "lint-staged": {
