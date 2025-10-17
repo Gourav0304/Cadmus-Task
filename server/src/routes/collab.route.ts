@@ -57,4 +57,16 @@ router.post('/:id/steps', async (req: Request, res: Response) => {
   res.json({ version: newVersion });
 });
 
+router.post('/:id/reset', async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  await prisma.doc.upsert({
+    where: { id },
+    update: { steps: [], clientIDs: [], version: 0 },
+    create: { id, steps: [], clientIDs: [], version: 0 },
+  });
+
+  res.json({ message: 'Document reset successfully.' });
+});
+
 export default router;

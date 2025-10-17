@@ -216,7 +216,16 @@ export const Editor: React.FC = () => {
         <div className="prose max-w-none border rounded-lg p-4 min-h-[300px] focus:outline-none">
           <EditorContent editor={editor} />
         </div>
-
+        <button
+          onClick={() =>
+            fetch('http://localhost:3001/collab/main-docs/reset', {
+              method: 'POST',
+            })
+          }
+          className="text-xs text-red-500 underline"
+        >
+          Reset Document
+        </button>
         <div className="text-sm text-gray-600 text-right mt-2">
           Word count: <span className="font-semibold">{wordCount}</span>
         </div>
