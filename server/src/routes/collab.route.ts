@@ -34,6 +34,11 @@ router.post('/:id/steps', async (req: Request, res: Response) => {
   }
 
   if (version !== doc.version) {
+    // Steps that the client tried to send
+    const clientSteps = steps.map((s: any) => s); // JSON steps
+
+    // Merge or queue these steps on top of current doc
+    // For simplicity, you can return 409 and let frontend apply rebasing
     return res.status(409).json({
       error: 'Version conflict',
       steps: doc.steps,

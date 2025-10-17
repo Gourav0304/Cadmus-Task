@@ -49,14 +49,16 @@ export const Editor: React.FC = () => {
   useEffect(() => {
     if (!editor) return;
 
-    let currentVersion = 0; // 👈 track version
+    let currentVersion = 0;
 
     const initCollab = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/collab/${DOC_ID}/steps`);
+        const res = await fetch(
+          `http://localhost:3001/collab/${DOC_ID}/steps?version=0`
+        );
         const data = await res.json();
 
-        currentVersion = data.version || 0; // 👈 save initial version
+        currentVersion = data.version || 0;
 
         const collabPlugin = collab({ version: currentVersion });
 
@@ -83,12 +85,12 @@ export const Editor: React.FC = () => {
       if (!editor) return;
 
       try {
+        // Fetch only steps after currentVersion
         const resFetch = await fetch(
-          `http://localhost:3001/collab/${DOC_ID}/steps`
+          `http://localhost:3001/collab/${DOC_ID}/steps?version=${currentVersion}`
         );
         const dataFetch = await resFetch.json();
 
-        // 🧠 Apply only if new version > current
         if (dataFetch.version > currentVersion) {
           const steps = dataFetch.steps.map((s: any) =>
             Step.fromJSON(editor.schema, s)
@@ -99,15 +101,15 @@ export const Editor: React.FC = () => {
             dataFetch.clientIDs
           );
           editor.view.dispatch(tr);
-          currentVersion = dataFetch.version; // ✅ update local version
+          currentVersion = dataFetch.version;
         }
 
-        // send new steps
+        // Send new steps
         const sendable = sendableSteps(editor.state);
         if (!sendable) return;
 
         const payload = {
-          version: getVersion(editor.state),
+          version: sendable.version,
           steps: sendable.steps.map((s) => s.toJSON()),
           clientID: sendable.clientID,
         };
@@ -121,14 +123,38 @@ export const Editor: React.FC = () => {
           }
         );
 
+        // Handle version conflict
         if (res.status === 409) {
           const data = await res.json();
-          const steps = data.steps.map((s: any) =>
+
+          // Apply server steps
+          const serverSteps = data.steps.map((s: any) =>
             Step.fromJSON(editor.schema, s)
           );
-          const tr = receiveTransaction(editor.state, steps, data.clientIDs);
+          const tr = receiveTransaction(
+            editor.state,
+            serverSteps,
+            data.clientIDs
+          );
           editor.view.dispatch(tr);
-          currentVersion = data.version; // ✅ after resolving conflict, update version
+
+          // Update local version
+          currentVersion = data.version;
+
+          // Resend unsent steps on top of server state
+          const resend = sendableSteps(editor.state);
+          if (resend) {
+            const resendPayload = {
+              version: resend.version,
+              steps: resend.steps.map((s) => s.toJSON()),
+              clientID: resend.clientID,
+            };
+            await fetch(`http://localhost:3001/collab/${DOC_ID}/steps`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(resendPayload),
+            });
+          }
         }
       } catch (err) {
         console.error('Error syncing:', err);
