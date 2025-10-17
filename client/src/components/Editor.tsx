@@ -2,12 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import {
-  collab,
-  sendableSteps,
-  getVersion,
-  receiveTransaction,
-} from 'prosemirror-collab';
+import { collab, sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import { EditorState } from 'prosemirror-state';
 import { Step } from 'prosemirror-transform';
 import {
@@ -19,8 +14,8 @@ import {
   Link as LinkIcon,
   Unlink,
 } from 'lucide-react';
+import './editor.css';
 
-// Debounce util
 const debounce = (fn: (...args: any[]) => void, delay: number) => {
   let timer: any;
   return (...args: any[]) => {
@@ -43,7 +38,7 @@ export const Editor: React.FC = () => {
       }),
     ],
     autofocus: 'end',
-    content: '', // start empty
+    content: '',
   });
 
   useEffect(() => {
@@ -85,7 +80,6 @@ export const Editor: React.FC = () => {
       if (!editor) return;
 
       try {
-        // Fetch only steps after currentVersion
         const resFetch = await fetch(
           `http://localhost:3001/collab/${DOC_ID}/steps?version=${currentVersion}`
         );
@@ -104,7 +98,6 @@ export const Editor: React.FC = () => {
           currentVersion = dataFetch.version;
         }
 
-        // Send new steps
         const sendable = sendableSteps(editor.state);
         if (!sendable) return;
 
@@ -123,11 +116,9 @@ export const Editor: React.FC = () => {
           }
         );
 
-        // Handle version conflict
         if (res.status === 409) {
           const data = await res.json();
 
-          // Apply server steps
           const serverSteps = data.steps.map((s: any) =>
             Step.fromJSON(editor.schema, s)
           );
@@ -138,10 +129,8 @@ export const Editor: React.FC = () => {
           );
           editor.view.dispatch(tr);
 
-          // Update local version
           currentVersion = data.version;
 
-          // Resend unsent steps on top of server state
           const resend = sendableSteps(editor.state);
           if (resend) {
             const resendPayload = {
@@ -174,7 +163,6 @@ export const Editor: React.FC = () => {
     };
   }, [editor]);
 
-  // Word count tracking
   useEffect(() => {
     if (!editor) return;
 
@@ -187,7 +175,6 @@ export const Editor: React.FC = () => {
     return () => editor.off('update', updateWordCount);
   }, [editor]);
 
-  // Link handling
   const setLink = () => {
     if (!editor) return;
     const previousUrl = editor.getAttributes('link').href;
@@ -204,7 +191,6 @@ export const Editor: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-3xl p-4">
-        {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-2 border-b pb-2 mb-4">
           <button
             onClick={() => editor?.chain().focus().toggleBold().run()}
@@ -257,7 +243,6 @@ export const Editor: React.FC = () => {
           </button>
         </div>
 
-        {/* Editor */}
         <div className="prose max-w-none border rounded-lg p-4 min-h-[300px] focus:outline-none">
           <EditorContent editor={editor} />
         </div>

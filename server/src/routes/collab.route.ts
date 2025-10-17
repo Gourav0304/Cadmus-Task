@@ -4,7 +4,6 @@ import { PrismaClient } from '@prisma/client';
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Fetch steps newer than a version
 router.get('/:id/steps', async (req: Request, res: Response) => {
   const { id } = req.params;
   const version = Number(req.query.version || 0);
@@ -21,7 +20,6 @@ router.get('/:id/steps', async (req: Request, res: Response) => {
   res.json({ steps, clientIDs, version: doc.version });
 });
 
-// Add new steps
 router.post('/:id/steps', async (req: Request, res: Response) => {
   const { id } = req.params;
   const { version, steps, clientID, clientIDs } = req.body;
@@ -34,11 +32,8 @@ router.post('/:id/steps', async (req: Request, res: Response) => {
   }
 
   if (version !== doc.version) {
-    // Steps that the client tried to send
-    const clientSteps = steps.map((s: any) => s); // JSON steps
+    const clientSteps = steps.map((s: any) => s);
 
-    // Merge or queue these steps on top of current doc
-    // For simplicity, you can return 409 and let frontend apply rebasing
     return res.status(409).json({
       error: 'Version conflict',
       steps: doc.steps,
