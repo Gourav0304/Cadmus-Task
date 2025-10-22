@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import './editor.css';
 import { debounce } from '../hooks/useDebounce';
-import { getSteps, postSteps, resetDoc } from '../services/apiCollab';
+import { getSteps, postSteps, resetDoc } from '../services/CollabApi';
 
 export const Editor: React.FC = () => {
   const [wordCount, setWordCount] = useState(0);
