@@ -1,6 +1,6 @@
 import { EditorContent } from '@tiptap/react';
+import { useCollabEditor } from '@/hooks';
 import { EditorToolbar } from './EditorToolbar';
-import { useCollabEditor } from '../../hooks';
 
 export const Editor = () => {
   const { editor, wordCount, setLink, resetDocument } =

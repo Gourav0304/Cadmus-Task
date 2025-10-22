@@ -20,6 +20,7 @@
     "lint-staged": "^16.1.2",
     "nodemon": "^3.0.3",
     "prettier": "^3.6.2",
+    "prisma": "^6.17.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.1.6",
     "typescript-eslint": "^8.35.1"
@@ -30,7 +31,6 @@
     "cors": "^2.8.5",
     "ethers": "^6.8.1",
     "express": "^4.21.2",
-    "prisma": "^6.17.1",
     "winston": "^3.17.0"
   },
   "lint-staged": {
