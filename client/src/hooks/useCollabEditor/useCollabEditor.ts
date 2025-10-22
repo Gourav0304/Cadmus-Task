@@ -7,6 +7,8 @@ import { EditorState } from 'prosemirror-state';
 import { Step } from 'prosemirror-transform';
 import { getSteps, postSteps, resetDoc } from '@/services';
 import { debounce } from '../useDebounce';
+import type { CollabStep } from '@/services/types';
+import { Node as ProseMirrorNode } from 'prosemirror-model';
 
 export const useCollabEditor = (docId: string) => {
   const [wordCount, setWordCount] = useState(0);
@@ -36,14 +38,15 @@ export const useCollabEditor = (docId: string) => {
 
         const collabPlugin = collab({ version: currentVersion });
         let newState = EditorState.create({
-          doc: editor.state.doc.type.createAndFill(),
+          doc: editor.state.doc.type.createAndFill() as ProseMirrorNode,
           plugins: [...editor.state.plugins, collabPlugin],
         });
 
         if (data.steps?.length) {
-          const steps = data.steps.map((s: any) =>
+          const steps = data.steps.map((s: CollabStep) =>
             Step.fromJSON(editor.schema, s)
           );
+
           const tr = receiveTransaction(newState, steps, data.clientIDs);
           newState = newState.apply(tr);
         }
@@ -61,7 +64,7 @@ export const useCollabEditor = (docId: string) => {
         const dataFetch = await getSteps(docId, currentVersion);
 
         if (dataFetch.version > currentVersion) {
-          const steps = dataFetch.steps.map((s: any) =>
+          const steps = dataFetch.steps.map((s: CollabStep) =>
             Step.fromJSON(editor.schema, s)
           );
           const tr = receiveTransaction(
@@ -79,12 +82,12 @@ export const useCollabEditor = (docId: string) => {
         await postSteps(docId, {
           version: sendable.version,
           steps: sendable.steps.map((s) => s.toJSON()),
-          clientID: sendable.clientID,
+          clientID: Number(sendable.clientID),
         });
-      } catch (err: any) {
-        if (err.message.includes('409')) {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message.includes('409')) {
           const data = await getSteps(docId, currentVersion);
-          const steps = data.steps.map((s: any) =>
+          const steps = data.steps.map((s: CollabStep) =>
             Step.fromJSON(editor.schema, s)
           );
           const tr = receiveTransaction(editor.state, steps, data.clientIDs);
@@ -118,7 +121,10 @@ export const useCollabEditor = (docId: string) => {
     };
 
     editor.on('update', updateWordCount);
-    return () => editor.off('update', updateWordCount);
+
+    return () => {
+      editor.off('update', updateWordCount);
+    };
   }, [editor]);
 
   const setLink = () => {
