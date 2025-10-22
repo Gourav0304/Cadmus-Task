@@ -5,8 +5,8 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 import prettier from 'eslint-plugin-prettier';
+import path from 'path';
 
-// Flat config uses object-based configuration
 export default tseslint.config([
   globalIgnores(['dist']),
   {
@@ -14,12 +14,16 @@ export default tseslint.config([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        tsconfigRootDir: __dirname, // root of client folder
+        project: [path.resolve(__dirname, 'tsconfig.json')], // client tsconfig
+      },
     },
     plugins: {
       prettier,
     },
     rules: {
-      ...prettier.configs.recommended.rules, 
+      ...prettier.configs.recommended.rules,
       'prettier/prettier': 'error',
     },
     extends: [
