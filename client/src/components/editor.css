@@ -14,3 +14,21 @@
   display: inline; 
   margin: 0;
 }
+
+.ProseMirror blockquote {
+  border-left: 4px solid #d1d5db; 
+  padding-left: 1rem;
+  margin: 0.5rem 0 0 0.5rem;
+  color: black;
+  font-style: italic;
+}
+.ProseMirror a {
+  color: #3b82f6;        /* Tailwind blue-500 */
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ProseMirror a:hover {
+  color: #1e40af;       
+  text-decoration: underline;
+}
