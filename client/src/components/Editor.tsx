@@ -15,14 +15,7 @@ import {
   Unlink,
 } from 'lucide-react';
 import './editor.css';
-
-const debounce = (fn: (...args: any[]) => void, delay: number) => {
-  let timer: any;
-  return (...args: any[]) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-};
+import { debounce } from '../hooks/useDebounce';
 
 export const Editor: React.FC = () => {
   const [wordCount, setWordCount] = useState(0);
