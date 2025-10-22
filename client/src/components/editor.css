@@ -1,40 +1,16 @@
-.editor-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.ProseMirror ul {
+  list-style-type: disc; 
+  padding-left: 1.25rem; 
+  margin: 0.5rem 0;      
 }
 
-.editor-toolbar {
-  display: flex;
-  gap: 0.5rem;
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0 0 0.5rem;
 }
 
-.editor-toolbar button {
-  background: #f3f3f3;
-  border: 1px solid #ccc;
-  padding: 0.3rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.editor-toolbar button.active {
-  background: #333;
-  color: white;
-}
-
-.editor-area {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  min-height: 300px;
-}
-
-.word-count {
-  text-align: right;
-  font-size: 0.9rem;
-  color: #555;
-}
-a {
-  color: #2563eb;
-  text-decoration: underline;
+.ProseMirror li p {
+  display: inline; 
+  margin: 0;
 }
