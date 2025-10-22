@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Bold,
   Italic,
@@ -15,10 +14,7 @@ type ToolbarProps = {
   onSetLink: () => void;
 };
 
-export const EditorToolbar: React.FC<ToolbarProps> = ({
-  editor,
-  onSetLink,
-}) => {
+export const EditorToolbar = ({ editor, onSetLink }: ToolbarProps) => {
   if (!editor) return null;
 
   return (
@@ -32,6 +28,7 @@ export const EditorToolbar: React.FC<ToolbarProps> = ({
       >
         <Bold size={16} />
       </button>
+
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         title="Italic"
@@ -41,6 +38,7 @@ export const EditorToolbar: React.FC<ToolbarProps> = ({
       >
         <Italic size={16} />
       </button>
+
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         title="Bullet List"
@@ -52,6 +50,7 @@ export const EditorToolbar: React.FC<ToolbarProps> = ({
       >
         <List size={16} />
       </button>
+
       <button
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         title="Numbered List"
@@ -63,6 +62,7 @@ export const EditorToolbar: React.FC<ToolbarProps> = ({
       >
         <ListOrdered size={16} />
       </button>
+
       <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         title="Quote"
@@ -74,9 +74,11 @@ export const EditorToolbar: React.FC<ToolbarProps> = ({
       >
         <Quote size={16} />
       </button>
+
       <button onClick={onSetLink} title="Add/Edit Link" className="p-2 rounded">
         <LinkIcon size={16} />
       </button>
+
       <button
         onClick={() => editor.chain().focus().unsetLink().run()}
         title="Remove Link"

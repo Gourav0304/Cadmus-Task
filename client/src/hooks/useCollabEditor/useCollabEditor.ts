@@ -5,8 +5,8 @@ import Link from '@tiptap/extension-link';
 import { collab, sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import { EditorState } from 'prosemirror-state';
 import { Step } from 'prosemirror-transform';
-import { debounce } from './useDebounce';
-import { getSteps, postSteps, resetDoc } from '../services/CollabApi';
+import { debounce } from '../useDebounce';
+import { getSteps, postSteps, resetDoc } from '../../services';
 
 export const useCollabEditor = (docId: string) => {
   const [wordCount, setWordCount] = useState(0);

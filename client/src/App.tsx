@@ -1,5 +1,5 @@
-import { EditorComponent } from './components/Editor';
-import './components/editor.css';
+import { Editor } from './components';
+import './components/Editer/editor.css';
 export default function App() {
-  return <EditorComponent />;
+  return <Editor />;
 }
