@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import './editor.css';
 import { debounce } from '../hooks/useDebounce';
+import { getSteps, postSteps, resetDoc } from '../services/apiCollab';
 
 export const Editor: React.FC = () => {
   const [wordCount, setWordCount] = useState(0);
@@ -41,15 +42,10 @@ export const Editor: React.FC = () => {
 
     const initCollab = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:3001/collab/${DOC_ID}/steps?version=0`
-        );
-        const data = await res.json();
-
+        const data = await getSteps(DOC_ID, 0);
         currentVersion = data.version || 0;
 
         const collabPlugin = collab({ version: currentVersion });
-
         let newState = EditorState.create({
           doc: editor.state.doc.type.createAndFill(),
           plugins: [...editor.state.plugins, collabPlugin],
@@ -73,10 +69,7 @@ export const Editor: React.FC = () => {
       if (!editor) return;
 
       try {
-        const resFetch = await fetch(
-          `http://localhost:3001/collab/${DOC_ID}/steps?version=${currentVersion}`
-        );
-        const dataFetch = await resFetch.json();
+        const dataFetch = await getSteps(DOC_ID, currentVersion);
 
         if (dataFetch.version > currentVersion) {
           const steps = dataFetch.steps.map((s: any) =>
@@ -100,42 +93,23 @@ export const Editor: React.FC = () => {
           clientID: sendable.clientID,
         };
 
-        const res = await fetch(
-          `http://localhost:3001/collab/${DOC_ID}/steps`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        if (res.status === 409) {
-          const data = await res.json();
-
-          const serverSteps = data.steps.map((s: any) =>
-            Step.fromJSON(editor.schema, s)
-          );
-          const tr = receiveTransaction(
-            editor.state,
-            serverSteps,
-            data.clientIDs
-          );
-          editor.view.dispatch(tr);
-
-          currentVersion = data.version;
-
-          const resend = sendableSteps(editor.state);
-          if (resend) {
-            const resendPayload = {
-              version: resend.version,
-              steps: resend.steps.map((s) => s.toJSON()),
-              clientID: resend.clientID,
-            };
-            await fetch(`http://localhost:3001/collab/${DOC_ID}/steps`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(resendPayload),
-            });
+        try {
+          await postSteps(DOC_ID, payload);
+        } catch (error: any) {
+          if (error.message.includes('409')) {
+            const data = await getSteps(DOC_ID, currentVersion);
+            const serverSteps = data.steps.map((s: any) =>
+              Step.fromJSON(editor.schema, s)
+            );
+            const tr = receiveTransaction(
+              editor.state,
+              serverSteps,
+              data.clientIDs
+            );
+            editor.view.dispatch(tr);
+            currentVersion = data.version;
+          } else {
+            console.error('Sync error:', error);
           }
         }
       } catch (err) {
@@ -241,11 +215,7 @@ export const Editor: React.FC = () => {
         </div>
 
         <button
-          onClick={() =>
-            fetch(`http://localhost:3001/collab/${DOC_ID}/reset`, {
-              method: 'POST',
-            })
-          }
+          onClick={() => resetDoc(DOC_ID)}
           className="text-xs text-red-500 underline mt-2"
         >
           Reset Document
