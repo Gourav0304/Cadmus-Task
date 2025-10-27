@@ -1,7 +1,7 @@
 import { apiClient } from './apiClient';
 import type { CollabData, CollabStep } from './types';
 
-const BASE = '/collab';
+const BASE = import.meta.env.VITE_COLLAB_BASE;
 
 export async function getSteps(
   docId: string,
