@@ -7,16 +7,28 @@ export const Editor = () => {
     useCollabEditor('main-docs');
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white shadow-lg rounded-xl w-full max-w-3xl p-4">
+    <div className="min-h-screen bg-gray-200 flex items-center justify-center p-6">
+      <div className="bg-white shadow-lg rounded-xl w-full max-w-3xl p-6 space-y-4">
+        <h1 className="text-2xl font-bold text-gray-800 text-center">
+          Cadmus Collaborative Editing Environment
+        </h1>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          This homework task involves building a collaborative rich-text editor
+          using <strong>React, TypeScript</strong>, and the{' '}
+          <strong>ProseMirror</strong> collaboration plugin via{' '}
+          <strong>TipTap</strong>.
+        </p>
+
         <EditorToolbar editor={editor} onSetLink={setLink} />
+
         <div
-          className="
-            border border-gray-200 rounded-lg min-h-52 p-4 focus-within:border-gray-400 focus-within:shadow-sm transition-all"
+          className="border border-gray-200 rounded-lg min-h-52 p-4 
+          focus-within:border-gray-400 focus-within:shadow-sm transition-all"
         >
           <EditorContent editor={editor} />
         </div>
-        <div className="flex justify-between">
+
+        <div className="flex justify-between items-center">
           <button
             onClick={resetDocument}
             className="text-xs text-red-500 underline mt-2"
