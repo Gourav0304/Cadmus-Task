@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+.ProseMirror-focused {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}

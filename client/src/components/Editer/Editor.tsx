@@ -10,7 +10,10 @@ export const Editor = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-3xl p-4">
         <EditorToolbar editor={editor} onSetLink={setLink} />
-        <div className="prose max-w-none border rounded-lg p-4 min-h-[300px] focus:outline-none">
+        <div
+          className="
+            border border-gray-200 rounded-lg min-h-52 p-4 focus-within:border-gray-400 focus-within:shadow-sm transition-all"
+        >
           <EditorContent editor={editor} />
         </div>
         <button

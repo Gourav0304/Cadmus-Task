@@ -22,7 +22,7 @@ export const EditorToolbar = ({ editor, onSetLink }: ToolbarProps) => {
   const activeBtn = 'bg-blue-100 text-blue-600';
 
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b pb-2 mb-4 bg-white/60 backdrop-blur-sm rounded-t-lg shadow-sm px-2">
+    <div className="flex flex-wrap items-center gap-1 border-b border-gray-200 hover:border-gray-400 pb-2 mb-4 bg-white/60 backdrop-blur-sm rounded-t-lg shadow-sm px-2">
       <div className="flex items-center gap-1 pr-1">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
