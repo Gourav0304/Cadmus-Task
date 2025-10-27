@@ -132,12 +132,10 @@ POSTGRES_USER=your_db_user
 POSTGRES_PASSWORD=your_db_password
 POSTGRES_DB=your_db_name
 POSTGRES_HOST=localhost
-POSTGRES_PORT=5433
+POSTGRES_PORT=5438
 
 # 🔗 Prisma Connection URL
 DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
-
-DATABASE_URL="postgresql://collab:collabpass@localhost:5438/collabdb?schema=public"
 ```
 
 ---
@@ -168,7 +166,7 @@ We will start the backend and frontend in this step individually
 Start backend:
 
 ```bash
-pnpm --filter api dev
+pnpm --filter server dev
 ```
 
 Start frontend:
@@ -179,7 +177,7 @@ pnpm --filter client dev
 
 App will be running at:  
 👉 Frontend: `http://localhost:3000`  
-👉 Backend: `http://localhost:5000`
+👉 Backend: `http://localhost:4000`
 
 ---
 
