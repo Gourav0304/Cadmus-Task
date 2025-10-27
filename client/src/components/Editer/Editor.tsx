@@ -16,14 +16,16 @@ export const Editor = () => {
         >
           <EditorContent editor={editor} />
         </div>
-        <button
-          onClick={resetDocument}
-          className="text-xs text-red-500 underline mt-2"
-        >
-          Reset Document
-        </button>
-        <div className="text-sm text-gray-600 text-right mt-2">
-          Word count: <span className="font-semibold">{wordCount}</span>
+        <div className="flex justify-between">
+          <button
+            onClick={resetDocument}
+            className="text-xs text-red-500 underline mt-2"
+          >
+            Reset Document
+          </button>
+          <div className="text-sm text-gray-600 text-right mt-2">
+            Word count: <span className="font-semibold">{wordCount}</span>
+          </div>
         </div>
       </div>
     </div>
