@@ -5,6 +5,7 @@
   "scripts": {
     "dev:server": "pnpm --filter server dev",
     "dev:client": "pnpm --filter client dev",
+    "build:prisma": "pnpm --filter server prisma:build",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint"
   }
