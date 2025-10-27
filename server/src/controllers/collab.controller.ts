@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { CollabService } from '../services/collab.service';
 
 export class CollabController {
-  static async getSteps(req: Request, res: Response) {
+  static async getSteps(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const version = Number(req.query.version || 0);
 
@@ -10,15 +10,11 @@ export class CollabController {
       const data = await CollabService.getSteps(id, version);
       res.json(data);
     } catch (err) {
-      if (err instanceof Error) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.status(500).json({ error: 'Unknown error occurred' });
-      }
+      next(err);
     }
   }
 
-  static async postSteps(req: Request, res: Response) {
+  static async postSteps(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
 
     try {
@@ -35,26 +31,18 @@ export class CollabController {
 
       res.json({ version: result.version });
     } catch (err) {
-      if (err instanceof Error) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.status(500).json({ error: 'Unknown error occurred' });
-      }
+      next(err);
     }
   }
 
-  static async resetDocument(req: Request, res: Response) {
+  static async resetDocument(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
 
     try {
       const result = await CollabService.resetDocument(id);
       res.json(result);
     } catch (err) {
-      if (err instanceof Error) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.status(500).json({ error: 'Unknown error occurred' });
-      }
+      next(err);
     }
   }
 }

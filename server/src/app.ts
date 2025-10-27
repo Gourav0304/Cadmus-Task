@@ -4,6 +4,7 @@ import logger from './utils/logger';
 import { Request, Response, NextFunction } from 'express';
 import healthRouter from './routes/health.route';
 import collabRouter from './routes/collab.route';
+import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use((req, _res, next) => {
   logger.info(`${req.method} ${req.originalUrl}`);
   next();
 });
+app.use(errorHandler);
 
 // Health check route
 app.use('/', healthRouter);
