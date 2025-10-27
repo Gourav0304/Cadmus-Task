@@ -111,13 +111,21 @@ cadmus-prosemirror-task/
 
 ## ⚙️ Environment Variables
 
-Create a `.env` file inside both **api/** and **client/**:
+Create a `.env` file inside both **server/** and **client/**:
 
-**📡 api/.env**
+**🎨 client/.env**
+
+```env
+# 🌍 API Endpoint
+VITE_API_BASE_URL=http://localhost:4000
+VITE_COLLAB_BASE=/collab
+```
+
+**📡 server/.env**
 
 ```env
 # 🚀 Server Config
-PORT=5000
+PORT=4000
 
 # 🐘 PostgreSQL Config
 POSTGRES_USER=your_db_user
@@ -128,13 +136,8 @@ POSTGRES_PORT=5433
 
 # 🔗 Prisma Connection URL
 DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
-```
 
-**🎨 client/.env**
-
-```env
-# 🌍 API Endpoint
-NEXT_PUBLIC_API_URL=http://localhost:5000
+DATABASE_URL="postgresql://collab:collabpass@localhost:5438/collabdb?schema=public"
 ```
 
 ---

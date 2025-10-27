@@ -5,10 +5,8 @@ services:
     image: postgres:15
     container_name: collab_pg
     restart: always
-    environment:
-      POSTGRES_USER: collab
-      POSTGRES_PASSWORD: collabpass
-      POSTGRES_DB: collabdb
+    env_file:
+      - ./server/.env
     ports:
       - '5438:5432'
     volumes:
