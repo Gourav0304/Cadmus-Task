@@ -150,7 +150,7 @@ docker compose up
 
 ### 2 Install dependencies
 
-This step will install the dependencies on both api and client folders
+This step will install the dependencies on both server and client folders
 
 At the root of the project:
 
@@ -181,32 +181,27 @@ App will be running at:
 
 ---
 
-🧪 Running Tests
+## 🧑‍💻 Developer Notes
 
-This project uses Jest with support for both frontend (client) and backend (api) tests.
-Tests can be run individually or all at once from the monorepo root.
+🧩 **Monorepo Setup**
 
-Run frontend (client) tests only
+- The project follows a monorepo architecture powered by pnpm workspaces, ensuring a unified dependency graph and simplified builds.
+- Both client and server are managed as isolated packages, yet share consistent linting, formatting, and TypeScript configurations.
 
-```bash
-pnpm run test:client
-```
+🧠 **Type Safety & Tooling**
 
-Run backend (api) tests only
+- End-to-end type safety is achieved with TypeScript on both client and server.
+- ESLint and Prettier ensure consistent code quality and formatting across the repo.
 
-```bash
-pnpm run test:api
-```
+🔁 **Collaboration & Sync Logic**
 
----
+- The editor leverages ProseMirror’s collaboration plugin to handle concurrent document editing.
+- Each user instance maintains a version and clientId, ensuring updates are synchronized even when multiple users edit simultaneously.
 
-## 📝 Developer Notes
+🚀 **Future Improvements**
 
-## Architecture Decisions and Salient features
-
-- The structure is a monorepo with pnpm workspaces
-
-- Maintains a clear separation of concerns between frontend (React) and backend (Express).
+- Add user authentication (JWT) for multi-user sessions.
+- Add testing suites (Vitest/Jest + Supertest) for backend and frontend coverage.
 
 ## App snapshots
 
