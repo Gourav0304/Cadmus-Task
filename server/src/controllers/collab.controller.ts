@@ -9,8 +9,12 @@ export class CollabController {
     try {
       const data = await CollabService.getSteps(id, version);
       res.json(data);
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.status(500).json({ error: 'Unknown error occurred' });
+      }
     }
   }
 
@@ -30,8 +34,12 @@ export class CollabController {
       }
 
       res.json({ version: result.version });
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.status(500).json({ error: 'Unknown error occurred' });
+      }
     }
   }
 
@@ -41,8 +49,12 @@ export class CollabController {
     try {
       const result = await CollabService.resetDocument(id);
       res.json(result);
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.status(500).json({ error: 'Unknown error occurred' });
+      }
     }
   }
 }

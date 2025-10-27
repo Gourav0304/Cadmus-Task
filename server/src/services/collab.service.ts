@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { CollabPostBody } from '../types/collab.types';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ export class CollabService {
     return { steps, clientIDs, version: doc.version };
   }
 
-  static async postSteps(docId: string, body: any) {
+  static async postSteps(docId: string, body: CollabPostBody) {
     const { version, steps, clientID, clientIDs } = body;
 
     let doc = await prisma.doc.findUnique({ where: { id: docId } });
@@ -47,7 +48,11 @@ export class CollabService {
 
     await prisma.doc.update({
       where: { id: docId },
-      data: { steps: newSteps, clientIDs: newClientIDs, version: newVersion },
+      data: {
+        steps: JSON.parse(JSON.stringify(newSteps)),
+        clientIDs: JSON.parse(JSON.stringify(newClientIDs)),
+        version: newVersion,
+      },
     });
 
     return { conflict: false, version: newVersion };
