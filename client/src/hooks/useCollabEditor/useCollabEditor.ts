@@ -139,7 +139,17 @@ export const useCollabEditor = (docId: string) => {
     editor.chain().focus().setLink({ href: url }).run();
   };
 
-  const resetDocument = () => resetDoc(docId);
+  const resetDocument = async () => {
+    if (!editor) return;
+
+    try {
+      await resetDoc(docId);
+      editor.commands.clearContent(true);
+      setWordCount(0);
+    } catch (err) {
+      console.error('Error resetting document:', err);
+    }
+  };
 
   return { editor, wordCount, setLink, resetDocument };
 };
