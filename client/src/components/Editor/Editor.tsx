@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { EditorContent } from '@tiptap/react';
 import { useCollabEditor } from '@/hooks';
 import { EditorToolbar } from './EditorToolbar';
@@ -5,6 +6,41 @@ import { EditorToolbar } from './EditorToolbar';
 export const Editor = () => {
   const { editor, wordCount, setLink, resetDocument } =
     useCollabEditor('main-docs');
+  const [tabInfo, setTabInfo] = useState('');
+  useEffect(() => {
+    async function detectBrowser() {
+      let browser = 'Unknown Browser';
+
+      if (
+        (navigator as any).brave &&
+        (await (navigator as any).brave.isBrave())
+      ) {
+        browser = 'Brave';
+      } else if (userAgent.includes('Edg')) {
+        browser = 'Edge';
+      } else if (userAgent.includes('Firefox')) {
+        browser = 'Firefox';
+      } else if (
+        userAgent.includes('Safari') &&
+        !userAgent.includes('Chrome')
+      ) {
+        browser = 'Safari';
+      } else if (userAgent.includes('Chrome')) {
+        browser = 'Chrome';
+      }
+
+      let tabId = sessionStorage.getItem('tabId');
+      if (!tabId) {
+        tabId = Math.floor(Math.random() * 10000).toString();
+        sessionStorage.setItem('tabId', tabId);
+      }
+
+      setTabInfo(`${browser} - Tab ${tabId}`);
+    }
+
+    const userAgent = navigator.userAgent;
+    detectBrowser();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center p-6">
@@ -35,6 +71,11 @@ export const Editor = () => {
           >
             Reset Document
           </button>
+
+          <div className="text-xs text-gray-500 mt-2 text-center flex-1">
+            {tabInfo}
+          </div>
+
           <div className="text-sm text-gray-600 text-right mt-2">
             Word count: <span className="font-semibold">{wordCount}</span>
           </div>
