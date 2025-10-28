@@ -1,1 +1,1 @@
-export * from './Editer';
+export * from './Editor';

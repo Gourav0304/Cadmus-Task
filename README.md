@@ -207,6 +207,6 @@ App will be running at:
 
 ![Dashboard preview](/assets/app-dashboard.png)
 
-## Working APP demo
+## Working App demo
 
 ![Dashboard demo](/assets/app-dashboard.gif)
