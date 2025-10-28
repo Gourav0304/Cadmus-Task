@@ -4,7 +4,7 @@ import { useCollabEditor } from '@/hooks';
 import { EditorToolbar } from './EditorToolbar';
 
 export const Editor = () => {
-  const { editor, wordCount, setLink, resetDocument } =
+  const { editor, wordCount, setLink, resetDocument, activeTab } =
     useCollabEditor('main-docs');
   const [tabInfo, setTabInfo] = useState('');
   useEffect(() => {
@@ -74,6 +74,7 @@ export const Editor = () => {
 
           <div className="text-xs text-gray-500 mt-2 text-center flex-1">
             {tabInfo}
+            {activeTab && <div className="text-blue-500 mt-1">{activeTab}</div>}
           </div>
 
           <div className="text-sm text-gray-600 text-right mt-2">

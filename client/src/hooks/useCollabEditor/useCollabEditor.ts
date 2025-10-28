@@ -12,6 +12,7 @@ import { Node as ProseMirrorNode } from 'prosemirror-model';
 
 export const useCollabEditor = (docId: string) => {
   const [wordCount, setWordCount] = useState(0);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -25,6 +26,39 @@ export const useCollabEditor = (docId: string) => {
     autofocus: 'end',
     content: '',
   });
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const typingChannel = new BroadcastChannel(`typing-${docId}`);
+
+    const handleTyping = () => {
+      const tabId = sessionStorage.getItem('tabId');
+      typingChannel.postMessage({ tabId, isTyping: true });
+      clearTimeout((window as any).typingTimeout);
+
+      (window as any).typingTimeout = setTimeout(() => {
+        typingChannel.postMessage({ tabId, isTyping: false });
+      }, 1500);
+    };
+
+    const handleReceive = (event: MessageEvent) => {
+      const tabId = sessionStorage.getItem('tabId');
+      const { tabId: senderTab, isTyping } = event.data;
+
+      if (senderTab !== tabId) {
+        setActiveTab(isTyping ? `Tab ${senderTab} is typing...` : null);
+      }
+    };
+
+    typingChannel.addEventListener('message', handleReceive);
+    editor.on('update', handleTyping);
+
+    return () => {
+      typingChannel.close();
+      editor.off('update', handleTyping);
+    };
+  }, [editor, docId]);
 
   useEffect(() => {
     if (!editor) return;
@@ -151,5 +185,5 @@ export const useCollabEditor = (docId: string) => {
     }
   };
 
-  return { editor, wordCount, setLink, resetDocument };
+  return { editor, wordCount, setLink, resetDocument, activeTab };
 };
