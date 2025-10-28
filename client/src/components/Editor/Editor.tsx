@@ -1,46 +1,10 @@
-import { useEffect, useState } from 'react';
 import { EditorContent } from '@tiptap/react';
 import { useCollabEditor } from '@/hooks';
 import { EditorToolbar } from './EditorToolbar';
 
 export const Editor = () => {
-  const { editor, wordCount, setLink, resetDocument, activeTab } =
+  const { editor, wordCount, setLink, resetDocument, activeTab, tabInfo } =
     useCollabEditor('main-docs');
-  const [tabInfo, setTabInfo] = useState('');
-  useEffect(() => {
-    async function detectBrowser() {
-      let browser = 'Unknown Browser';
-
-      if (
-        (navigator as any).brave &&
-        (await (navigator as any).brave.isBrave())
-      ) {
-        browser = 'Brave';
-      } else if (userAgent.includes('Edg')) {
-        browser = 'Edge';
-      } else if (userAgent.includes('Firefox')) {
-        browser = 'Firefox';
-      } else if (
-        userAgent.includes('Safari') &&
-        !userAgent.includes('Chrome')
-      ) {
-        browser = 'Safari';
-      } else if (userAgent.includes('Chrome')) {
-        browser = 'Chrome';
-      }
-
-      let tabId = sessionStorage.getItem('tabId');
-      if (!tabId) {
-        tabId = Math.floor(Math.random() * 10000).toString();
-        sessionStorage.setItem('tabId', tabId);
-      }
-
-      setTabInfo(`${browser} - Tab ${tabId}`);
-    }
-
-    const userAgent = navigator.userAgent;
-    detectBrowser();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center p-6">

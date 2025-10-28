@@ -13,6 +13,7 @@ import { Node as ProseMirrorNode } from 'prosemirror-model';
 export const useCollabEditor = (docId: string) => {
   const [wordCount, setWordCount] = useState(0);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [tabInfo, setTabInfo] = useState('');
 
   const editor = useEditor({
     extensions: [
@@ -28,6 +29,41 @@ export const useCollabEditor = (docId: string) => {
   });
 
   useEffect(() => {
+    async function detectBrowser() {
+      const userAgent = navigator.userAgent;
+      let browser = 'Unknown Browser';
+
+      if (
+        (navigator as any).brave &&
+        (await (navigator as any).brave.isBrave())
+      ) {
+        browser = 'Brave';
+      } else if (userAgent.includes('Edg')) {
+        browser = 'Edge';
+      } else if (userAgent.includes('Firefox')) {
+        browser = 'Firefox';
+      } else if (
+        userAgent.includes('Safari') &&
+        !userAgent.includes('Chrome')
+      ) {
+        browser = 'Safari';
+      } else if (userAgent.includes('Chrome')) {
+        browser = 'Chrome';
+      }
+
+      let tabId = sessionStorage.getItem('tabId');
+      if (!tabId) {
+        tabId = Math.floor(Math.random() * 10000).toString();
+        sessionStorage.setItem('tabId', tabId);
+      }
+
+      setTabInfo(`${browser} - Tab ${tabId}`);
+    }
+
+    detectBrowser();
+  }, []);
+
+  useEffect(() => {
     if (!editor) return;
 
     const typingChannel = new BroadcastChannel(`typing-${docId}`);
@@ -35,8 +71,8 @@ export const useCollabEditor = (docId: string) => {
     const handleTyping = () => {
       const tabId = sessionStorage.getItem('tabId');
       typingChannel.postMessage({ tabId, isTyping: true });
-      clearTimeout((window as any).typingTimeout);
 
+      clearTimeout((window as any).typingTimeout);
       (window as any).typingTimeout = setTimeout(() => {
         typingChannel.postMessage({ tabId, isTyping: false });
       }, 1500);
@@ -155,7 +191,6 @@ export const useCollabEditor = (docId: string) => {
     };
 
     editor.on('update', updateWordCount);
-
     return () => {
       editor.off('update', updateWordCount);
     };
@@ -175,7 +210,6 @@ export const useCollabEditor = (docId: string) => {
 
   const resetDocument = async () => {
     if (!editor) return;
-
     try {
       await resetDoc(docId);
       editor.commands.clearContent(true);
@@ -185,5 +219,5 @@ export const useCollabEditor = (docId: string) => {
     }
   };
 
-  return { editor, wordCount, setLink, resetDocument, activeTab };
+  return { editor, wordCount, setLink, resetDocument, activeTab, tabInfo };
 };
